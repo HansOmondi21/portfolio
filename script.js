@@ -1,28 +1,17 @@
-// Mobile navigation toggle
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const mobileNav = document.getElementById('mobileNav');
     const menuIcon = document.getElementById('menuIcon');
     const closeIcon = document.getElementById('closeIcon');
-
-    if (mobileMenuBtn && mobileNav && menuIcon && closeIcon) {
+    
+    if (mobileMenuBtn && mobileNav) {
         mobileMenuBtn.addEventListener('click', function() {
-            const isOpen = !mobileNav.classList.contains('hidden');
-            
-            if (isOpen) {
-                // Close menu
-                mobileNav.classList.add('hidden');
-                menuIcon.classList.remove('hidden');
-                closeIcon.classList.add('hidden');
-            } else {
-                // Open menu
-                mobileNav.classList.remove('hidden');
-                menuIcon.classList.add('hidden');
-                closeIcon.classList.remove('hidden');
-            }
+            mobileNav.classList.toggle('hidden');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
         });
-
-        // Close menu when clicking on mobile nav links
+        
+        // Close mobile nav when clicking on a link
         const mobileLinks = document.querySelectorAll('.nav-mobile-link');
         mobileLinks.forEach(link => {
             link.addEventListener('click', function() {
@@ -32,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
+    
     // Smooth scrolling for navigation links
     const navLinks = document.querySelectorAll('a[href^="#"]');
     navLinks.forEach(link => {
@@ -42,17 +31,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
-                const offsetTop = targetElement.offsetTop - 80; // Account for fixed header
+                const headerHeight = 64; // Adjust based on your header height
+                const targetPosition = targetElement.offsetTop - headerHeight;
+                
                 window.scrollTo({
-                    top: offsetTop,
+                    top: targetPosition,
                     behavior: 'smooth'
                 });
             }
         });
     });
-
-    // Form submission (basic handling)
-    const contactForm = document.querySelector('.form');
+    
+    // Form submission handling
+    const contactForm = document.getElementById('contactForm');
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -71,53 +62,80 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Here you would typically send the data to a server
-            // For now, we'll just show a success message
             alert('Thank you for your message! I\'ll get back to you soon.');
             
             // Reset form
             this.reset();
         });
     }
-
-    // Add scroll effect to navigation
+    
+    // Navigation scroll effect
     let lastScrollTop = 0;
-    const nav = document.querySelector('.navigation');
+    const navigation = document.getElementById('navigation');
     
     window.addEventListener('scroll', function() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
         if (scrollTop > lastScrollTop && scrollTop > 100) {
-            // Scrolling down & past threshold
-            nav.style.transform = 'translateY(-100%)';
+            // Scrolling down - hide nav
+            navigation.classList.add('nav-hidden');
         } else {
-            // Scrolling up or at top
-            nav.style.transform = 'translateY(0)';
+            // Scrolling up - show nav
+            navigation.classList.remove('nav-hidden');
         }
         
         lastScrollTop = scrollTop;
     });
-
-    // Add intersection observer for animations
+    
+    // Intersection Observer for animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-
+    
     const observer = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('animate');
             }
         });
     }, observerOptions);
-
+    
     // Observe elements for animation
-    const animatedElements = document.querySelectorAll('.skill-card, .stat-card, .contact-item');
-    animatedElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
+    const animateElements = document.querySelectorAll('.skill-card, .stat-card, .contact-item');
+    animateElements.forEach(element => {
+        observer.observe(element);
+    });
+    
+    // Typing effect for hero tagline (optional enhancement)
+    const tagline = document.querySelector('.hero-tagline');
+    if (tagline) {
+        const text = tagline.textContent;
+        tagline.textContent = '';
+        let index = 0;
+        
+        function typeWriter() {
+            if (index < text.length) {
+                tagline.textContent += text.charAt(index);
+                index++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+        
+        // Start typing effect after a delay
+        setTimeout(typeWriter, 1000);
+    }
+    
+    // Smooth reveal animation for hero elements
+    const heroElements = document.querySelectorAll('.profile-photo-container, .hero-title, .hero-tagline, .hero-buttons');
+    heroElements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            element.style.transition = 'all 0.6s ease-out';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, 200 + (index * 200));
     });
 });
